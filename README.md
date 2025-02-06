@@ -122,4 +122,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## License
 
-This project is licensed under the **BSD-3-Clause License**. See the `[LICENSE](https://github.com/mre31/FlaskFileShare?tab=BSD-3-Clause-1-ov-file)` file for details.
+This project is licensed under the **BSD-3-Clause License**. See the [LICENSE](https://github.com/mre31/FlaskFileShare?tab=BSD-3-Clause-1-ov-file) file for details.
