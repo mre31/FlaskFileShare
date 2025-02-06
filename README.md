@@ -10,6 +10,11 @@ This project is a file-sharing application developed using Flask. Users can uplo
 - **Security:** The application enforces HTTPS and includes security headers to protect against common web vulnerabilities.
 - **Cloudflare Tunnel Integration:** The application can be exposed to the internet securely using Cloudflare Tunnel, ensuring secure and reliable access.
 
+## Images
+![File Upload Page](https://github.com/user-attachments/assets/b5134b1f-02dc-4e27-bfaa-d1d896f2bcca)
+![Upload Successfull Page](https://github.com/user-attachments/assets/69eba7b0-4700-42b0-ad95-9ce162629c68)
+![Download Page](https://github.com/user-attachments/assets/733b3d61-e9c9-46bd-9310-7c4b34e8fd1c)
+
 ## How It Works
 
 The application allows users to upload files, which are split into chunks for efficient handling. Once uploaded, a unique download link is generated. The link is valid for 24 hours, after which the file is automatically deleted. The application also supports parallel downloads, allowing users to download files faster by splitting them into chunks.
