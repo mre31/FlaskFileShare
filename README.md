@@ -82,8 +82,7 @@ This will start the Flask development server, and the application will be access
 
 For convenience, you can create a `run.bat` file to start the application. This is especially useful on Windows systems.
 
-1. Create a file named `run.bat` in the project directory.
-2. Double-click the `run.bat` file to start the application. It will activate the virtual environment and run `app.py`.
+. Double-click the `run.bat` file to start the application. It will activate the virtual environment and run `app.py`.
 
 ## Usage
 
