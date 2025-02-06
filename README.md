@@ -1,4 +1,4 @@
-# Flask File Sharing Application
+# Flask File Sharing Webapp
 
 This project is a file-sharing application developed using Flask. Users can upload files and share them via a unique download link. The files are available for download for 24 hours, after which they are automatically deleted.
 
