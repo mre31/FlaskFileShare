@@ -40,7 +40,6 @@ To securely expose the application to the internet, you can use Cloudflare Tunne
 
 - Python 3.7 or higher
 - Flask
-- Waitress (for production deployment)
 - Cloudflare Tunnel (optional, for secure internet access)
 
 ### Steps
