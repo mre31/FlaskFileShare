@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Share Your File</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-form {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(65, 105, 225, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .upload-form h2 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .custom-file-input {
+            display: inline-block;
+            padding: 12px 24px;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            border: 2px dashed royalblue;
+            border-radius: 12px;
+            font-size: 16px;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            width: 80%;
+        }
+
+        .custom-file-input:hover {
+            background-color: #eef2ff;
+            transform: translateY(-2px);
+        }
+
+        .custom-file-input input[type="file"] {
+            display: none;
+        }
+
+        #selectedFile {
+            color: #666;
+            margin: 0;
+            font-size: 14px;
+            background: #f8f9fa;
+            padding: 8px 16px;
+            border-radius: 8px;
+            max-width: 80%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-top: 10px;
+        }
+
+        /* Yeni buton stili */
+        .submit-button {
+            margin: 0 auto;
+            font-family: inherit;
+            font-size: 18px;
+            background: royalblue;
+            color: white;
+            padding: 0.8em 1.2em;
+            padding-left: 1em;
+            display: flex;
+            align-items: center;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(65, 105, 225, 0.2);
+        }
+
+        .submit-button:hover {
+            box-shadow: 0 8px 20px rgba(65, 105, 225, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .submit-button span {
+            display: block;
+            margin-left: 0.3em;
+            transition: all 0.3s ease-in-out;
+            font-weight: 500;
+        }
+
+        .submit-button svg {
+            display: block;
+            transform-origin: center center;
+            transition: transform 0.3s ease-in-out;
+            width: 20px;
+            height: 20px;
+        }
+
+        .submit-button:hover .svg-wrapper {
+            animation: fly-1 0.6s ease-in-out infinite alternate;
+        }
+
+        .submit-button:hover svg {
+            transform: translateX(1.2em) rotate(45deg) scale(1.1);
+        }
+
+        .submit-button:hover span {
+            transform: translateX(5em);
+        }
+
+        .submit-button:active {
+            transform: scale(0.95) translateY(-1px);
+        }
+
+        @keyframes fly-1 {
+            from {
+                transform: translateY(0.1em);
+            }
+
+            to {
+                transform: translateY(-0.1em);
+            }
+        }
+
+        .upload-form form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .upload-form br {
+            display: none;
+        }
+
+        /* Responsive tasarım */
+        @media (max-width: 600px) {
+            .upload-form {
+                padding: 25px;
+                margin: 15px;
+            }
+
+            .custom-file-input {
+                width: 90%;
+                padding: 10px 20px;
+            }
+
+            .upload-form h2 {
+                font-size: 24px;
+            }
+        }
+
+        /* Loading bar stilleri */
+        .progress-container {
+            width: 100%;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: royalblue;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .upload-stats {
+            color: #666;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* Upload sırasında buton stili */
+        .submit-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Loading animasyonu */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .uploading .progress {
+            background: linear-gradient(90deg, royalblue, #1e40af);
+            background-size: 200% 100%;
+            animation: gradient 2s linear infinite, pulse 2s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        /* Dosya boyutu uyarısı için stil */
+        .size-warning {
+            color: #6b7280;
+            font-size: 12px;
+            margin: 5px 0 15px 0;
+            font-style: italic;
+            opacity: 0.8;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Dosya boyutu aşıldığında gösterilecek hata stili */
+        .size-error {
+            color: #dc3545;
+            font-weight: 500;
+        }
+
+        /* Mobil uyumluluk için yeni stiller */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .upload-form {
+                padding: 25px;
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
+
+            h2 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            .custom-file-input {
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .submit-button {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            #selectedFile {
+                font-size: 13px;
+                padding: 8px;
+                margin: 8px 0;
+            }
+
+            .progress-text {
+                font-size: 14px;
+            }
+
+            .upload-stats {
+                font-size: 13px;
+            }
+        }
+
+        /* Küçük ekranlar için ek optimizasyonlar */
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .upload-form {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            .progress-bar {
+                height: 6px;
+            }
+
+            .custom-file-input {
+                padding: 10px;
+            }
+        }
+
+        /* Dokunmatik cihazlar için iyileştirmeler */
+        @media (hover: none) {
+            .submit-button:hover {
+                transform: none;
+            }
+
+            .submit-button:active {
+                transform: scale(0.98);
+            }
+
+            .custom-file-input:hover {
+                transform: none;
+            }
+
+            .custom-file-input:active {
+                background-color: #eef2ff;
+            }
+
+            .submit-button:hover .svg-wrapper {
+                animation: none;
+            }
+
+            .submit-button:hover svg {
+                transform: none;
+            }
+
+            .submit-button:hover span {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-form">
+        <h2>Share Your File</h2>
+        <form method="post" enctype="multipart/form-data" id="uploadForm">
+            <label class="custom-file-input">
+                <input type="file" name="file" required onchange="updateFileName(this)">
+                <span id="fileLabel">Choose a file to share</span>
+            </label>
+            <div id="selectedFile">No file selected</div>
+            
+            <!-- Progress bar container -->
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">Preparing upload...</div>
+                <div class="upload-stats" id="uploadStats"></div>
+            </div>
+
+            <button type="submit" class="submit-button" id="submitButton">
+                <div class="svg-wrapper-1">
+                    <div class="svg-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="none" d="M0 0h24v24H0z"></path>
+                            <path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <span>Generate Link</span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        function updateFileName(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('selectedFile').textContent = file.name;
+                document.getElementById('selectedFile').style.color = '#666';
+                document.getElementById('submitButton').disabled = false;
+            } else {
+                document.getElementById('selectedFile').textContent = 'No file selected';
+                document.getElementById('selectedFile').style.color = '#666';
+            }
+        }
+
+        // Chunk hazırlama ve upload fonksiyonlarını optimize edelim
+        async function prepareAndUploadChunks(file, fileId) {
+            const totalSize = file.size;
+            let chunkSize;
+            
+            // Dosya boyutuna göre chunk boyutunu optimize et
+            if (totalSize > 1024 * 1024 * 1024) { // 1GB üzeri
+                chunkSize = 25 * 1024 * 1024; // 25MB chunks
+            } else if (totalSize > 512 * 1024 * 1024) { // 512MB üzeri
+                chunkSize = 20 * 1024 * 1024; // 20MB chunks
+            } else {
+                chunkSize = 15 * 1024 * 1024; // 15MB chunks
+            }
+
+            const chunks = Math.ceil(totalSize / chunkSize);
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            let uploadedSize = 0;
+            let startTime = Date.now();
+
+            console.log(`Starting upload: ${file.name} (${(totalSize / (1024 * 1024)).toFixed(2)} MB)`);
+            console.log(`Chunk size: ${(chunkSize / (1024 * 1024)).toFixed(2)} MB, Total chunks: ${chunks}`);
+
+            try {
+                const results = [];
+                
+                // Her chunk'ı sırayla işle
+                for (let chunkNumber = 0; chunkNumber < chunks; chunkNumber++) {
+                    const start = chunkNumber * chunkSize;
+                    const end = Math.min(start + chunkSize, totalSize);
+                    const chunk = file.slice(start, end);
+                    
+                    console.log(`Processing chunk ${chunkNumber + 1}/${chunks}`);
+                    
+                    const formData = new FormData();
+                    formData.append('file', chunk);
+                    formData.append('chunk', chunkNumber);
+                    formData.append('total', chunks);
+                    formData.append('fileId', fileId);
+                    formData.append('filename', file.name);
+                    
+                    // Chunk'ı upload et
+                    const response = await fetch('/upload-chunk', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to upload chunk ${chunkNumber + 1}`);
+                    }
+                    
+                    const result = await response.json();
+                    results.push(result);
+                    
+                    // İlerlemeyi güncelle
+                    uploadedSize += chunk.size;
+                    const progress = (uploadedSize / totalSize) * 100;
+                    const elapsedTime = (Date.now() - startTime) / 1000;
+                    const speed = uploadedSize / elapsedTime / (1024 * 1024);
+                    
+                    progressBar.style.width = progress + '%';
+                    progressText.textContent = `Processing and Uploading: ${Math.round(progress)}% (${speed.toFixed(2)} MB/s)`;
+                    
+                    console.log(`Chunk ${chunkNumber + 1}/${chunks} uploaded (${Math.round(progress)}%)`);
+                    
+                    // Son chunk'ın sonucunu kontrol et
+                    if (result.is_final) {
+                        if (result.success) {
+                            console.log('Final chunk processed successfully');
+                        } else if (result.error === 'Missing chunks') {
+                            console.error('Missing chunks detected:', result.missing);
+                            throw new Error('Some chunks are missing');
+                        }
+                    }
+                }
+
+                // Upload tamamlandı
+                const totalTime = (Date.now() - startTime) / 1000;
+                const avgSpeed = (totalSize / totalTime / (1024 * 1024)).toFixed(2);
+                console.log(`Upload completed in ${totalTime.toFixed(2)} seconds (Avg. speed: ${avgSpeed} MB/s)`);
+
+                return results;
+            } catch (error) {
+                console.error('Upload error:', error);
+                throw error;
+            }
+        }
+
+        // Ana upload fonksiyonunu güncelle
+        document.getElementById('uploadForm').onsubmit = async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const fileInput = form.querySelector('input[type="file"]');
+            if (!fileInput.files.length) return;
+
+            const file = fileInput.files[0];
+            const fileId = generateUUID();
+            
+            console.log('Starting file upload process...');
+            console.log('File:', file.name);
+            console.log('Size:', (file.size / (1024 * 1024)).toFixed(2), 'MB');
+            console.log('File ID:', fileId);
+
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressContainer = document.getElementById('progressContainer');
+            const submitButton = document.getElementById('submitButton');
+
+            // Progress bar'ı göster
+            progressContainer.style.display = 'block';
+            submitButton.disabled = true;
+            progressBar.parentElement.classList.add('uploading');
+            submitButton.querySelector('span').textContent = 'Uploading...';
+
+            try {
+                const results = await prepareAndUploadChunks(file, fileId);
+                
+                console.log('All chunks uploaded, checking results:', results);
+                
+                // Son sonucu kontrol et
+                const finalResult = results[results.length - 1];
+                console.log('Final chunk result:', finalResult);
+
+                if (finalResult && finalResult.is_final) {
+                    if (finalResult.success && finalResult.download_link) {
+                        console.log('Valid final result, redirecting...');
+                        progressText.textContent = '100% - Redirecting...';
+                        
+                        try {
+                            // POST isteği ile yönlendir
+                            const response = await fetch('/', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: new URLSearchParams({
+                                    'file_id': finalResult.file_id
+                                })
+                            });
+
+                            if (response.ok) {
+                                const html = await response.text();
+                                document.open();
+                                document.write(html);
+                                document.close();
+                            } else {
+                                throw new Error('Failed to load success page');
+                            }
+                        } catch (error) {
+                            console.error('Redirect error:', error);
+                            // Alternatif yönlendirme
+                            window.location.href = finalResult.download_link;
+                        }
+                    } else if (finalResult.error === 'Missing chunks') {
+                        // Eksik chunk'ları tekrar göndermeyi dene
+                        console.log('Missing chunks detected:', finalResult.missing);
+                        progressText.textContent = `Retrying missing chunks (${finalResult.received}/${finalResult.total})...`;
+                        
+                        const missingChunks = results.filter(result => finalResult.missing.includes(result.chunk));
+                        if (missingChunks.length > 0) {
+                            // Eksik chunk'ları tekrar gönder
+                            const retryResults = await prepareAndUploadChunks(file, fileId);
+                            
+                            // Son sonucu tekrar kontrol et
+                            const finalRetryResult = retryResults[retryResults.length - 1];
+                            if (finalRetryResult.success && finalRetryResult.download_link) {
+                                window.location.href = '/' + '?' + new URLSearchParams({
+                                    file_id: finalRetryResult.file_id || fileId
+                                }).toString();
+                                return;
+                            }
+                        }
+                        throw new Error(`Failed to upload missing chunks: ${finalResult.missing.join(', ')}`);
+                    } else {
+                        throw new Error('Upload completed but server response is invalid');
+                    }
+                } else {
+                    throw new Error('Final response not received');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                progressText.textContent = 'Upload failed: ' + error.message;
+                submitButton.disabled = false;
+                submitButton.querySelector('span').textContent = 'Generate Link';
+                progressBar.parentElement.classList.remove('uploading');
+            }
+        };
+
+        // UUID oluşturma fonksiyonu
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+    </script>
+</body>
+</html> 

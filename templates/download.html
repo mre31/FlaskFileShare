@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Download File</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .download-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(65, 105, 225, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .file-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .file-info p {
+            margin: 10px 0;
+            color: #666;
+        }
+
+        .file-info strong {
+            color: #2c3e50;
+        }
+
+        .progress-container {
+            width: 100%;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: royalblue;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: #666;
+            font-size: 14px;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .speed-info {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .download-info {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .start-download {
+            display: inline-block;
+            background: royalblue;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .start-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(65, 105, 225, 0.3);
+        }
+
+        .start-download:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Mobil uyumluluk için yeni stiller */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .download-container {
+                padding: 25px;
+                margin: 10px;
+                width: calc(100% - 20px);
+                max-width: none;
+            }
+
+            h2 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            .file-info {
+                padding: 15px;
+                margin: 15px 0;
+                font-size: 14px;
+            }
+
+            .start-download {
+                width: 100%;
+                padding: 15px;
+                font-size: 16px;
+                margin-top: 10px;
+            }
+
+            .progress-text {
+                font-size: 16px;
+            }
+
+            .speed-info {
+                font-size: 14px;
+            }
+
+            .download-info {
+                font-size: 13px;
+            }
+        }
+
+        /* Küçük ekranlar için ek optimizasyonlar */
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .download-container {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            .file-info {
+                padding: 12px;
+                font-size: 13px;
+            }
+
+            .file-info p {
+                margin: 8px 0;
+            }
+
+            .progress-bar {
+                height: 6px;
+            }
+        }
+
+        /* Dokunmatik cihazlar için iyileştirmeler */
+        @media (hover: none) {
+            .start-download:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .start-download:active {
+                transform: scale(0.98);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="download-container">
+        <h2>Download File</h2>
+        <div class="file-info">
+            <p><strong>File Name:</strong> <span id="fileName">{{ filename }}</span></p>
+            <p><strong>File Size:</strong> <span id="fileSize">Checking...</span></p>
+            <p><strong>Download Method:</strong> Parallel Download (Wait Until It Speeds Up!)</p>
+        </div>
+        <button class="start-download" id="startDownload">Start Download</button>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+            <div class="progress-text" id="progressText">0%</div>
+            <div class="speed-info" id="speedInfo">Speed: 0 MB/s</div>
+            <div class="download-info" id="downloadInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        // Dosya boyutunu kontrol et
+        async function checkFileSize() {
+            try {
+                const response = await fetch('{{ download_url }}', { method: 'HEAD' });
+                const size = response.headers.get('content-length');
+                const sizeInMB = (size / (1024 * 1024)).toFixed(2);
+                document.getElementById('fileSize').textContent = sizeInMB + ' MB';
+            } catch (error) {
+                document.getElementById('fileSize').textContent = 'Unknown';
+            }
+        }
+
+        async function downloadWithChunks(url, filename) {
+            const progressContainer = document.getElementById('progressContainer');
+            const startButton = document.getElementById('startDownload');
+            progressContainer.style.display = 'block';
+            startButton.disabled = true;
+
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                const totalSize = parseInt(response.headers.get('content-length'));
+                const chunkSize = 300 * 1024 * 1024; // 300MB chunks
+                const chunks = Math.ceil(totalSize / chunkSize);
+                let downloadedSize = 0;
+                let lastReportedProgress = 0;
+                let startTime = Date.now();
+                
+                const progressBar = document.getElementById('progressBar');
+                const progressText = document.getElementById('progressText');
+                const speedInfo = document.getElementById('speedInfo');
+                const downloadInfo = document.getElementById('downloadInfo');
+
+                // Progress güncelleme fonksiyonu
+                function updateProgress(downloaded) {
+                    const exactProgress = (downloaded / totalSize) * 100;
+                    const roundedProgress = Math.floor(exactProgress);
+                    
+                    // Sadece değişiklik varsa güncelle
+                    if (roundedProgress > lastReportedProgress) {
+                        progressBar.style.width = exactProgress + '%';
+                        progressText.textContent = roundedProgress + '%';
+                        lastReportedProgress = roundedProgress;
+                    }
+
+                    const elapsedTime = (Date.now() - startTime) / 1000;
+                    const speed = downloaded / elapsedTime / (1024 * 1024);
+                    speedInfo.textContent = `Speed: ${speed.toFixed(2)} MB/s`;
+                    
+                    const downloadedMB = (downloaded / (1024 * 1024)).toFixed(2);
+                    const totalMB = (totalSize / (1024 * 1024)).toFixed(2);
+                    downloadInfo.textContent = `Downloaded: ${downloadedMB}/${totalMB} MB`;
+                }
+
+                // Blob parçalarını saklayacak array
+                const blobParts = new Array(chunks).fill(null);
+
+                // Her chunk için
+                for (let i = 0; i < chunks; i++) {
+                    const start = i * chunkSize;
+                    const end = Math.min(start + chunkSize, totalSize) - 1;
+                    
+                    try {
+                        const response = await fetch(url, {
+                            headers: { 'Range': `bytes=${start}-${end}` }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const reader = response.body.getReader();
+                        let chunkData = [];
+                        
+                        // Chunk'ı küçük parçalar halinde oku
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            
+                            chunkData.push(value);
+                            downloadedSize += value.length;
+                            updateProgress(downloadedSize);
+                        }
+
+                        // Chunk'ı Blob'a çevir
+                        blobParts[i] = new Blob(chunkData);
+
+                    } catch (chunkError) {
+                        console.error(`Error downloading chunk ${i}:`, chunkError);
+                        i--; // Aynı chunk'ı tekrar dene
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        continue;
+                    }
+                }
+
+                // Son kontroller ve indirme işlemi
+                const finalBlob = new Blob(blobParts);
+                if (finalBlob.size !== totalSize) {
+                    throw new Error(`Size mismatch. Expected: ${totalSize}, Got: ${finalBlob.size}`);
+                }
+
+                // Progress'i %100 yap
+                progressBar.style.width = '100%';
+                progressText.textContent = '100%';
+
+                // İndirme bağlantısını oluştur
+                const blobUrl = URL.createObjectURL(finalBlob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+
+                // İndirme tamamlandı
+                const totalTime = (Date.now() - startTime) / 1000;
+                const avgSpeed = (totalSize / totalTime / (1024 * 1024)).toFixed(2);
+                speedInfo.textContent = `Average Speed: ${avgSpeed} MB/s`;
+                downloadInfo.textContent = `Total Size: ${(totalSize / (1024 * 1024)).toFixed(2)} MB`;
+                startButton.textContent = 'Download Complete';
+            } catch (error) {
+                console.error('Download error:', error);
+                progressText.textContent = 'Download failed: ' + error.message;
+                speedInfo.textContent = 'Error';
+                startButton.disabled = false;
+                startButton.textContent = 'Retry Download';
+            }
+        }
+
+        // Sayfa yüklendiğinde dosya boyutunu kontrol et
+        checkFileSize();
+
+        // Download butonuna tıklandığında
+        document.getElementById('startDownload').addEventListener('click', function() {
+            downloadWithChunks('{{ download_url }}', '{{ filename }}');
+        });
+    </script>
+</body>
+</html> 

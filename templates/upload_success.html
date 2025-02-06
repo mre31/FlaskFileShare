@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Successful</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-message {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(65, 105, 225, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            animation: scale-up 0.4s ease-out;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        p {
+            color: #666;
+            margin: 15px 0;
+            font-size: 16px;
+        }
+
+        .timer {
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0 25px 0;
+        }
+
+        .download-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border: 2px dashed royalblue;
+        }
+
+        .download-link {
+            display: block;
+            word-break: break-all;
+            color: royalblue;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 10px 0;
+            transition: color 0.3s ease;
+        }
+
+        .download-link:hover {
+            color: #1e40af;
+        }
+
+        .download-button {
+            display: inline-block;
+            background: royalblue;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .download-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(65, 105, 225, 0.3);
+        }
+
+        .new-upload-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #f8f9fa;
+            color: #666;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .new-upload-button:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        @keyframes scale-up {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Mobil uyumluluk için yeni stiller */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .success-message {
+                padding: 25px;
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
+
+            .success-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            h2 {
+                font-size: 24px;
+                margin-bottom: 12px;
+            }
+
+            p {
+                font-size: 14px;
+                margin: 12px 0;
+            }
+
+            .download-box {
+                padding: 15px;
+                margin: 20px 0;
+            }
+
+            .download-button, .new-upload-button {
+                width: 100%;
+                margin: 10px 0;
+                padding: 15px;
+                box-sizing: border-box;
+            }
+        }
+
+        /* Küçük ekranlar için ek optimizasyonlar */
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .success-message {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            .download-box {
+                padding: 12px;
+                margin: 15px 0;
+            }
+
+            .download-link {
+                font-size: 13px;
+            }
+        }
+
+        /* Dokunmatik cihazlar için iyileştirmeler */
+        @media (hover: none) {
+            .download-button:hover,
+            .new-upload-button:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .download-button:active,
+            .new-upload-button:active {
+                transform: scale(0.98);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-message">
+        <svg class="success-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#4ade80"/>
+            <path d="M16.0303 8.96967C16.3232 9.26256 16.3232 9.73744 16.0303 10.0303L11.0303 15.0303C10.7374 15.3232 10.2626 15.3232 9.96967 15.0303L7.96967 13.0303C7.67678 12.7374 7.67678 12.2626 7.96967 11.9697C8.26256 11.6768 8.73744 11.6768 9.03033 11.9697L10.5 13.4393L14.9697 8.96967C15.2626 8.67678 15.7374 8.67678 16.0303 8.96967Z" fill="white"/>
+        </svg>
+        <h2>File uploaded successfully!</h2>
+        <p>Your file is ready to share. The link will be valid for:</p>
+        <div class="timer" id="countdown">24:00:00</div>
+        <div class="download-box">
+            <p>Share this link:</p>
+            <a href="{{ download_link }}" class="download-link" target="_blank">{{ download_link }}</a>
+            <a href="{{ download_link }}" class="download-button">Download Now</a>
+        </div>
+        <a href="/" class="new-upload-button">Share Another File</a>
+    </div>
+
+    <script>
+        // Geri sayım için script
+        function startTimer(duration) {
+            let timer = duration;
+            const countdown = document.getElementById('countdown');
+            
+            const interval = setInterval(function () {
+                const hours = Math.floor(timer / 3600);
+                const minutes = Math.floor((timer % 3600) / 60);
+                const seconds = timer % 60;
+
+                countdown.textContent = hours.toString().padStart(2, '0') + ':'
+                    + minutes.toString().padStart(2, '0') + ':'
+                    + seconds.toString().padStart(2, '0');
+
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    countdown.textContent = "Link expired!";
+                }
+            }, 1000);
+        }
+
+        // 24 saat = 86400 saniye
+        startTimer(86400);
+
+        // Download butonunu paralel download sayfasına yönlendir
+        document.querySelector('.download-button').addEventListener('click', function(e) {
+            e.preventDefault();
+            const downloadUrl = this.href;
+            const filename = downloadUrl.split('/').pop();
+            window.location.href = downloadUrl.replace('?direct=true', '') + '?filename=' + filename;
+        });
+    </script>
+</body>
+</html> 
